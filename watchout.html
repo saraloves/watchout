@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <style>
   circle{
-    fill: blue; stroke-width: 1; stroke:white;
+    stroke-width: 1; stroke:white;
   }
-</style>
+/*  .player{
+    fill: orange;
+  }
+*/</style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <div>Score: <span class="score"></span></div>
@@ -11,6 +14,39 @@
   </div>
   <!-- <span class="scoreboard"></span> -->
     <script>
+    // drag
+    var drag = d3.behavior.drag()
+      .on('drag', function(d, i){
+        d[0] += d3.event.dx;
+        d[1] += d3.event.dy;
+
+        d3.select(this).attr("cx", d[0]).attr("cy", d[1]);
+        // d3.select(this).attr("transform", function(d, i) {
+        //     return "translate(" + [d.cx, d.cy] + ")";
+        //   })
+        });
+
+    // svg.on('mousemove', function(){
+    //   mouse = {x: d3.mouse(this)[0], y: d3.mouse(this)[1]};
+    // })
+
+    // var detectCollisions = function(){
+    //   circle.each(function(){
+    //     var circle = d3.select(this);
+    //     var cx = circle.attr('cx');
+    //     var cy = circle.attr('cy');
+
+    //     var x = cx - mouse.x;
+    //     var y = cy - mouse.y;
+
+    //     if (Math.sqrt(x * y * y) < r) {
+    //       gameStats.score = 0;
+    //     }
+    //   })
+    // };
+
+    // setInterval(detectCollisions, 500);
+
     // set up the environment
     var gameOptions = {
       height: 450,
@@ -34,22 +70,49 @@
     var gameBoard = d3.select('.container').append('svg:svg')
       .attr('width', gameOptions.width)
       .attr('height', gameOptions.height);
-
+    //counter
     var scoreCounter = setInterval(function(){
         gameStats.score += 1;
         d3.select('.score').text(gameStats.score);
       }, 50);
+    // player
+    // var Player = function(){
+    //   this.attr = {
+    //     'r': 4,
+    //     'fill': 'orange'
+    //   }
+    // }
+      //d3.select('svg').enter().append('circle').attr({'r': 4, 'fill': 'orange'});
 
     var width = 800;
     var height = 800;
-    var circle = d3.selectAll('svg').attr({width: width, height: height})
-    .selectAll('circle').data(d3.range(100))
-    .enter().append('circle').attr('r', 0).call(loop);
+    var circle = d3.selectAll('svg')
+    .attr({width: width, height: height})
+    .selectAll('circle')
+    .data(d3.range(100))
+    .enter()
+    .append('circle')
+    .attr('r', 0)
+    .call(loop);
+
+    var player = d3.select('svg').selectAll('#player')
+    .data([[50, 50]]).enter()
+    .append('circle')
+    .attr('r', 8)
+    .attr('fill', 'red')
+    .attr("cx", 50)
+    .attr("cy", 50)
+    .attr("id", "player")
+    .call(drag);
+    // .call(detectCollisions);
+
+    // drag.apply(player);
 
     function loop(circle){
       circle.transition().duration(1000)
       .attr({
         r: 5,//function(){return Math.random() * width/50 },
+        fill: 'blue',
         cx: function() {return Math.random() * width },
         cy: function() {return Math.random() * height }
       }).each('end', function(){loop(d3.select(this)) });
