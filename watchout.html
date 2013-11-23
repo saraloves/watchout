@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<style>
+  circle{
+    fill: blue; stroke-width: 1; stroke:white;
+  }
+</style>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <div>Score: <span class="score"></span></div>
+  <div class="container" style="border: 2px solid #000; margin-top: 50px; width: 800px; height: 800px">
+  </div>
+  <!-- <span class="scoreboard"></span> -->
+    <script>
+    // set up the environment
+    var gameOptions = {
+      height: 450,
+      width: 700,
+      nEnemies: 30,
+      padding: 20
+    }
+
+    // score keeping
+    var gameStats = {
+      score: 0,
+      bestScore: 0
+    }
+
+    // board
+    var axes = {
+      x: d3.scale.linear().domain([0, 100]).range([0, gameOptions.width]),
+      y: d3.scale.linear().domain([0, 100]).range([0, gameOptions.height])
+    }
+
+    var gameBoard = d3.select('.container').append('svg:svg')
+      .attr('width', gameOptions.width)
+      .attr('height', gameOptions.height);
+
+    var scoreCounter = setInterval(function(){
+        gameStats.score += 1;
+        d3.select('.score').text(gameStats.score);
+      }, 50);
+
+    var width = 800;
+    var height = 800;
+    var circle = d3.selectAll('svg').attr({width: width, height: height})
+    .selectAll('circle').data(d3.range(100))
+    .enter().append('circle').attr('r', 0).call(loop);
+
+    function loop(circle){
+      circle.transition().duration(1000)
+      .attr({
+        r: 5,//function(){return Math.random() * width/50 },
+        cx: function() {return Math.random() * width },
+        cy: function() {return Math.random() * height }
+      }).each('end', function(){loop(d3.select(this)) });
+    }
+
+    </script>
+  </body>
+</html>
