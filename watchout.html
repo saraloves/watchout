@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<style>
-  circle{
-    stroke-width: 1; stroke:white;
-  }
-/*  .player{
-    fill: orange;
-  }
-*/</style>
+<head>
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
 <body>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <div>Score: <span class="score"></span></div>
+  <div>
+    Top Score: <span class="bestscore"></span>
+    <br />
+    Score: <span class="score"></span>
+  </div>
   <div class="container" style="border: 2px solid #000; margin-top: 50px; width: 800px; height: 800px">
   </div>
   <!-- <span class="scoreboard"></span> -->
@@ -57,6 +56,7 @@
     var scoreCounter = setInterval(function(){
         gameStats.score += 1;
         d3.select('.score').text(gameStats.score);
+        d3.select('.bestscore').text(gameStats.bestScore);
       }, 50);
 
     var mouse = {x: 50, y:50};
@@ -75,6 +75,9 @@
         var y = cy - mouse.y;
 
         if(Math.sqrt((x * x) + (y * y)) < r * 2){
+          if (gameStats.score > gameStats.bestScore) {
+              gameStats.bestScore = gameStats.score;
+          }
           gameStats.score = 0;
         }
       })
@@ -85,6 +88,7 @@
 
     var width = 800;
     var height = 800;
+
     var circle = d3.selectAll('svg')
     .attr({width: width, height: height})
     .selectAll('circle')
@@ -93,6 +97,32 @@
     .append('circle')
     .attr('r', 0)
     .call(loop);
+
+    var stars = svg.selectAll('circle');
+    stars.append('pattern')
+      .attr({
+        'patternUnits': 'objectBoundingBox',
+        'height': 1,
+        'width': 1
+      })
+      .append('image').attr({
+        'xlink:href': 'shuriken.png',
+        'x': 0, 'y': 0,
+        'width': 16,
+        'height': 16
+      });
+    // stars.append('svg:pattern')
+    //   .attr('id', 'shiruken')
+    //   .attr('patternUnits', 'objectBoundingBox')
+    //   .attr('height', '1')
+    //   .attr('width', '1')
+    //   .append('svg:image')
+    //   .attr('xlink:href', 'shuriken.png')
+    //   .attr('class', 'spin')
+    //   .attr('x', 0)
+    //   .attr('y', 0)
+    //   .attr('width', "20")
+    //   .attr('height', "20");
 
     var player = d3.select('svg').selectAll('#player')
     .data([[50, 50]]).enter()
@@ -111,7 +141,7 @@
       circle.transition().duration(6000)
       .attr({
         r: 10,//function(){return Math.random() * width/50 },
-        fill: 'blue',
+        fill: 'none',
         cx: function() {return Math.random() * width },
         cy: function() {return Math.random() * height }
       }).each('end', function(){loop(d3.select(this)) });
